@@ -7,12 +7,18 @@ const app = express();
 const puerto = 3000;
 const SECRET_KEY = 'clave-secreta-para-el-token';
 
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '..', 'proyecto-final-jap')));
 
 const users = [
-    { id: 1, username: 'usuarioEjemplo', password: 'contraseñaSegura' }
+    { id: 1, username: 'usuario@ejemplo.com', password: '123456' }
 ];
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html')); 
+});
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -42,13 +48,11 @@ const authorize = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
+        console.error('Token inválido o expirado:', error.message);
         return res.status(403).json({ message: 'Token inválido.' });
     }
 };
 
-app.get('/', (req, res) => {
-    res.send('Servidor funcionando correctamente.');
-});
 
 app.get('/cats/cat.json', authorize, (req, res) => {
     res.sendFile(path.join(__dirname, "data", "cats", "cat.json"));
@@ -59,19 +63,19 @@ app.get('/sell/publish.json', authorize, (req, res) => {
 });
 
 app.get('/cats_products/:file', authorize, (req, res) => {
-    res.sendFile(path.join(__dirname, "data", "cats_products", req.params.file + ".json"));
+    res.sendFile(path.join(__dirname, "data", "cats_products", req.params.file));
 });
 
 app.get('/products/:file', authorize, (req, res) => {
-    res.sendFile(path.join(__dirname, "data", "products", req.params.file + ".json"));
+    res.sendFile(path.join(__dirname, "data", "products", req.params.file));
 });
 
 app.get('/products_comments/:file', authorize, (req, res) => {
-    res.sendFile(path.join(__dirname, "data", "products_comments", req.params.file + ".json"));
+    res.sendFile(path.join(__dirname, "data", "products_comments", req.params.file));
 });
 
 app.get('/user_cart/:file', authorize, (req, res) => {
-    res.sendFile(path.join(__dirname, "data", "user_cart", req.params.file + ".json"));
+    res.sendFile(path.join(__dirname, "data", "user_cart", req.params.file));
 });
 
 app.get('/cart/buy.json', authorize, (req, res) => {
